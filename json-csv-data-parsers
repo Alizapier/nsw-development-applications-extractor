@@ -1,0 +1,48 @@
+const applications = items[0].json.Application || [];
+
+return applications.map(app => {
+  const location = Array.isArray(app.Location) && app.Location.length > 0 ? app.Location[0] : {};
+  const devTypes = Array.isArray(app.DevelopmentType) ? app.DevelopmentType : [];
+  const lotInfo = (location.Lot && location.Lot.length > 0) ? location.Lot[0] : {};
+
+  return {
+    json: {
+      // 🎯 Your required fields
+      lga: app.Council?.CouncilName || "nil",
+      da_number: app.PlanningPortalApplicationNumber || "nil",
+      property_address: location.FullAddress || "nil",
+      lodgement_date: "nil", // Not in API
+      decision_date: "nil",  // Not in API
+      status: app.ApplicationStatus || "nil",
+      proposal_description: devTypes.map(d => d.DevelopmentType || "nil").join(", ") || "nil",
+      estimated_cost_of_works: app.CostOfDevelopment ?? null,
+      planning_instrument: "nil",      // Not in API
+      land_use_category: "nil",        // Not in API
+      applicant: "nil",                // Not in API
+      approval_conditions: "nil",      // Not in API
+      coordinates: {
+        latitude: location.Y || null,
+        longitude: location.X || null
+      },
+      document_links: "nil",           // Not in API
+
+      // 🔍 Additional fields from API
+      date_last_updated: app.DateLastUpdated || null,
+      application_type: app.ApplicationType || "nil",
+      cdc_status_display: app.CDCAcceptedDisplay || "nil",
+      certifier_accreditation_number: app.CertifierAccreditationNumber || "nil",
+
+      // Optional location breakdown
+      address_details: {
+        street_number: location.StreetNumber1 || "nil",
+        street_name: location.StreetName || "nil",
+        street_type: location.StreetType || "nil",
+        suburb: location.Suburb || "nil",
+        postcode: location.Postcode || "nil",
+        state: location.State || "nil",
+        lot: lotInfo.Lot || "nil",
+        plan_label: lotInfo.PlanLabel || "nil"
+      }
+    }
+  };
+});
